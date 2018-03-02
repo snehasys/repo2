@@ -11,7 +11,9 @@
 *
 *	Input Format::
 *	First line contains 4 integers N,P,D,M.
-*	Next 3 lines contain 3 arrays each of size N denoting the rating of the person in the corresponding field. The first one is the ratings of N people on their poetry skill, next on their dancing skill and the third one on their music skills.
+*	Next 3 lines contain 3 arrays each of size N denoting the rating of the person in the corresponding field.
+*       The first one is the ratings of N people on their poetry skill, next on their dancing skill and the third one
+*       on their music skills.
 *
 *	Output Format::
 *	Print an integer denoting the maximum sum of ratings that can be obtained
@@ -30,15 +32,16 @@
 *	Or, you can also choose the 3rd person for Poetry , 2nd for Dancing and 1st for Music 4+3+3=10
 */
 
-// Write your code here
+
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <set>
 
 using namespace std;
+
 class CompareDist{ //comparator for priority queue
-public: bool operator()(pair<int,size_t> n1, pair<int,size_t> n2) { return n1.first > n2.first;}
+    public: bool operator()(pair<int,size_t> n1, pair<int,size_t> n2) { return n1.first > n2.first;}
 };
 enum AT {P=0, D=1, M=2}; // ArtistType
 ///////////////////////////////////////////////////////////////////
@@ -69,8 +72,8 @@ int getKmaxSkillSum(vector<vector<int> >& skillMatrix,
     }
 	/// Here we remove the already sortlisted people for next talentHunt
     for(set<size_t>::iterator rit = tombStoned.rbegin(); rit = tombStoned.rend(); rit++){
-	  size_t removePeople = *rit;
-	  skillMatrix.erase (skillMatrix.begin()+ removePeople);
+        size_t removePeople = *rit;
+        skillMatrix.erase (skillMatrix.begin()+ removePeople);
     }
     return maxSkill;
 }
@@ -93,7 +96,7 @@ int findBest(const vector<vector<int> >skills,
         }
         sum += getKmaxSkillSum(tempSkills, howMany, artist );
     }    
-//        cout<<endl<<sum<<" bestSumFound \n\n";
+//    cout<<endl<<sum<<" bestSumFound \n\n";
     return sum;
 }
  //////////////////////////////////////////////////////
@@ -101,14 +104,14 @@ int findBest(const vector<vector<int> >skills,
 void readSkillMatrix(vector<vector<int> >& allSkills){ 
     int i=0;
     while(i < allSkills.size()/*i.e. totalPerson*/){
-            int Pskill, Dskill, Mskill;
-            cin >> Pskill;
-            allSkills[i].push_back(Pskill);
-            cin >> Dskill;
-            allSkills[i].push_back(Dskill);
-            cin >> Mskill;
-            allSkills[i].push_back(Mskill);
-            ++i;
+        int Pskill, Dskill, Mskill;
+        cin >> Pskill;
+        allSkills[i].push_back(Pskill);
+        cin >> Dskill;
+        allSkills[i].push_back(Dskill);
+        cin >> Mskill;
+        allSkills[i].push_back(Mskill);
+        ++i;
     }
 }
 //////////////////////////////////////////////////////////////
@@ -123,7 +126,7 @@ int main(){
     
     int maxTalentFound = 0;
     
-    // six permutations required(maybe): i.e. PDM, PMD, MDP, MPD, DPM, DMP
+    // six permutations required(at most): i.e. PDM, PMD, MDP, MPD, DPM, DMP
     // find the best result among the above six
     vector<vector<AT> > allPermutations;
     allPermutations.push_back(vector<AT> {AT::P, AT::D, AT::M});
@@ -135,10 +138,9 @@ int main(){
     
     for (auto onePattern: allPermutations){
         int currentBestSum = findBest(allSkills, onePattern, poetRequired, dancerRequired, musicRequired);
-         
+
         if(currentBestSum > maxTalentFound)
-                maxTalentFound = currentBestSum;
-        
+            maxTalentFound = currentBestSum;        
     }
     cout << maxTalentFound; // final result to STDOUT
     return 0;

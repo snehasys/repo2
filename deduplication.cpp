@@ -1,7 +1,7 @@
 /*
 	PROBLEM STATEMENT:
 		<DeDuplication problem>
-		1. Compress a file. 		a.k.a. dedup()
+		1. Compress a file. 	    a.k.a. dedup()
 		2. And Uncompress the File. a.k.a. redup()
 	
 	DETAILED PROBLEM STATEMENT:		
@@ -50,21 +50,19 @@
 
 using namespace std;
 const size_t CHUNK = 1024;
-unordered_map<hashKey, pair<outLocation, set<inLocation>>> dictionary;
-
-
+unordered_map<hashKey, pair<outLocation, set<inLocation>>> dictionary; // Global singleton dictionary. // Later, should come up with a better approach
+unsigned long long int original_file_checksum = 0;
+////////////////////////////////////////////////////////////
 void printSet(set<size_t> &bunch){
     for(auto &each: bunch)
         cout<< endl << to_string(each);
 }
-
-void dedup(string input_file_path, string deduped_file_path) 
-{
+////////////////////////////////////////////////////////////
+void dedup(string input_file_path, string deduped_file_path){
     dictionary.clear();
     ifstream in (input_file_path,   ifstream::binary);
     ofstream out(deduped_file_path, ofstream::binary);
-    if(!in && !out) 
-    {
+    if(!in && !out){
         return; // file open failed
     }
     // ***filesize calculator *****
@@ -74,8 +72,7 @@ void dedup(string input_file_path, string deduped_file_path)
     // ********
     
     size_t outPos = 0;
-    for ( size_t pos = 0; pos<fileSize; pos+= CHUNK)
-    {
+    for ( size_t pos = 0; pos<fileSize; pos+= CHUNK){
         in.seekg(pos /*, in.end*/);
         char buffer[CHUNK];
         in.read(buffer, CHUNK);
@@ -90,45 +87,36 @@ void dedup(string input_file_path, string deduped_file_path)
         size_t hashVal = digest(buffStr);
         
         auto it = dictionary.find(hashVal);
-        if (it == dictionary.end())
-        {   // new hash, insert
+        if (it == dictionary.end()){   // new hash, insert
             set<size_t> inPoses = {pos};
             dictionary[hashVal] = make_pair(outPos, inPoses ); //insert new entry
             // write new buffer in outputfile at outpos location
             out.write (buffer, CHUNK);
             outPos += CHUNK;
         }
-        else
-        { // duplicate found, only update the set<>
+        else{ // duplicate found, only update the set<>
             it->second.second.insert(pos); // <hashkey, pair<outLocation, set<inLocation>>>
             //printSet(it->second.second);
         }
        // cout<< " hashkey::"<< hashVal<< endl;
-
     }
     in.close();
     out.close();
+    original_file_checksum = CHECKSUM(input_file_path);
 }
-
-
-
-bool redup(string deduped_file_path, string output_file_path) 
-{
+//////////////////////////////////////////////////////////////
+bool redup(string deduped_file_path, string output_file_path){
     ifstream in (deduped_file_path, ifstream::binary);
     ofstream out(output_file_path,  ofstream::binary);
-    if(!in && !out) 
-    {
+    if(!in && !out){
         return false; // file open failed
     } 
-     // actual, deduped
-    map<size_t, size_t> flatMap;
-
+   //map<actual,deduped>
+    map <size_t, size_t> flatMap;
     for(auto &item: dictionary){
-        for(auto actualLoc : item.second.second)
-        {
+        for(auto actualLoc : item.second.second){
             flatMap[actualLoc] = item.second.first; //duped location            
-        }
-        
+        }        
     } // flatmap constructed
     
     for(auto i: flatMap){
@@ -144,6 +132,8 @@ bool redup(string deduped_file_path, string output_file_path)
     }
     in.close();
     out.close();
-    
+    if(CHECKSUM(output_file_path) == original_file_checksum){
+        return true; // Great Scott! redup was able to successfully reconstruct the original file!
+    }
     return false; // redup failed
 }

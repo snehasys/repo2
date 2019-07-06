@@ -34,20 +34,21 @@ def getPLsViaTags():
     for tag in allTags:
         tag=tag.strip()
         if tagIndex.get(tag, -1) != -1:
-            ret[str(allPlaylists.get(tagIndex[tag]).id )] = [tag]  # str(tagIndex.get(tag)) # str(allPlaylists.get(tagIndex[tag]).id + '  ')
+            ret[allPlaylists.get(tagIndex[tag]).id ] = tag  # str(tagIndex.get(tag)) # str(allPlaylists.get(tagIndex[tag]).id + '  ')
             for similar in similarPlaylists.get(tagIndex[tag]):
-                ret[similar[0]] = "suggested playlist" #str(allPlaylists.get(similar))
+                ret[similar[0]] = str(allPlaylists.get(similar[0]).name)
 
         # print( str(tagIndex.get(tag, str('$' + tag+' not found'))))
         print(tag)
     # print (tagIndex.items())
     songs = []
-    print(ret.keys())
+    # print(ret.keys())
     for count in sortOnPlayCount():
-        if(count[0] in ret.keys()):
-            print ('present')
-            songs.append(ret[count[0]])
-    return str(ret.items())
+        if(int(count[0]) in ret.keys()):
+            songs.append(ret.get(count[0]))
+            print (str(count[0]), ' is present')
+    # return str(ret.items())
+    return str(songs)
 
 @app.route('/addplaylists')
 def addNewPlaylist(tag:str):
@@ -78,7 +79,7 @@ def sortOnPlayCount():
     return sorted(playCount.items(), key=lambda x: x[1], reverse=True)
 
 def UT_setup():
-    testdata = [ "Dilemma", "avicii", "indie", "Genie in a Bottle", "Can't Buy Me Love", "Hard to Handle", "Le Freak", "Butterfly", "The Ketchup Song (Aserejé)", "San Francisco (Be Sure to Wear Flowers in Your Hair)", "Uninvited", "zAnother One Bites the Dust", "The Wedding", "Amazing Grace", "Oh, Pretty Woman", "Wannabe", "I Will Survive", "Sweet Mother", "Wind of Change", "Sukiyaki", "Da Da Da", "Rudolph the Red-Nosed Reindeer", "I Want to Hold Your Hand", "Time to Say Goodbye", "Y.M.C.A.", "Do They Know It's Christmas?", "Believe", "Kung Fu Fighting", "Rock Your Baby", "Paper Doll", "The Last Farewell", "Fernando", "Wabash Cannonball", "Diana", "Un-Break My Heart", "My Sweet Lord", "Macarena", "Chirpy Chirpy Cheep Cheep", "I'm a Believer", "Mundian To Bach Ke", "Tennessee Waltz", "Earth Angel","Hound Dog","A Whiter Shade of Pale", "...Baby One More Time", "Petit Papa Noël", "Lady Marmalade", "Simon Says", "Waterloo", "My Blue Heaven", "That Silver-Haired Daddy of Mine", "She Loves You", "Massachusetts", "Karma Chameleon", "Sadeness (Part I)", "Release Me", "Seasons in the Sun", "I'll Be There", "Crimson and Clover", "Delilah", "Great Balls of Fire", "Lambada", "Like a Prayer", "María", "Let's All Chant", "March from the River Kwai", "Can't Get You Out of My Head", "Daydream Believer", "Pass the Dutchie", "I Think I Love You", "Are You Lonesome Tonight?", "Surrender", "Harper Valley PTA", "Il Silenzio", "The Chipmunk Song (Christmas Don't Be Late)", "Ballad of the Green Berets", "I Can Help", "Joy to the World", "Telstar" ]  
+    testdata = [ "Dilemma", "avicii", "indie", "classical", "best of anouska shankar", "Instrumenntals", "Genie in a Bottle", "Can't Buy Me Love", "Hard to Handle", "Le Freak", "Butterfly", "The Ketchup Song (Aserejé)", "San Francisco (Be Sure to Wear Flowers in Your Hair)", "Uninvited", "zAnother One Bites the Dust", "The Wedding", "Amazing Grace", "Oh, Pretty Woman", "Wannabe", "I Will Survive", "Sweet Mother", "Wind of Change", "Sukiyaki", "Da Da Da", "Rudolph the Red-Nosed Reindeer", "I Want to Hold Your Hand", "Time to Say Goodbye", "Y.M.C.A.", "Do They Know It's Christmas?", "Believe", "Kung Fu Fighting", "Rock Your Baby", "Paper Doll", "The Last Farewell", "Fernando", "Wabash Cannonball", "Diana", "Un-Break My Heart", "My Sweet Lord", "Macarena", "Chirpy Chirpy Cheep Cheep", "I'm a Believer", "Mundian To Bach Ke", "Tennessee Waltz", "Earth Angel","Hound Dog","A Whiter Shade of Pale", "...Baby One More Time", "Petit Papa Noël", "Lady Marmalade", "Simon Says", "Waterloo", "My Blue Heaven", "That Silver-Haired Daddy of Mine", "She Loves You", "Massachusetts", "Karma Chameleon", "Sadeness (Part I)", "Release Me", "Seasons in the Sun", "I'll Be There", "Crimson and Clover", "Delilah", "Great Balls of Fire", "Lambada", "Like a Prayer", "María", "Let's All Chant", "March from the River Kwai", "Can't Get You Out of My Head", "Daydream Believer", "Pass the Dutchie", "I Think I Love You", "Are You Lonesome Tonight?", "Surrender", "Harper Valley PTA", "Il Silenzio", "The Chipmunk Song (Christmas Don't Be Late)", "Ballad of the Green Berets", "I Can Help", "Joy to the World", "Telstar" ]  
     for sampleTag in testdata: # data filler
         pl = PlayList(sampleTag)
         allPlaylists[pl.id] = pl
@@ -86,20 +87,23 @@ def UT_setup():
         playCount[pl.id]  = 0
         LikesCount[pl.id] = 0
         similarPlaylists[pl.id] = []
-
-
     playCount[tagIndex['zAnother One Bites the Dust']] += 1
     playCount[tagIndex['zAnother One Bites the Dust']] += 1
+    playCount[tagIndex['avicii']] += 1
     playCount[tagIndex['avicii']] += 1
     playCount[tagIndex['avicii']] += 1
     similarPlaylists.get(tagIndex['avicii']).append([tagIndex['Believe']])
     similarPlaylists.get(tagIndex['avicii']).append([tagIndex['Telstar']])
     similarPlaylists.get(tagIndex['avicii']).append([tagIndex['Surrender']])
+    playCount[tagIndex['classical']] += 19
 
+    similarPlaylists.get(tagIndex['classical']).append([tagIndex['best of anouska shankar']])
 
+    playCount[tagIndex['Telstar']] += 7
+
+ 
 if __name__ == '__main__':
     # print ( getPLsViaTags() ) 
     UT_setup()
     
-    app.run(debug=True, port=8081) #run app in debug mode on port 5000
-
+    app.run(debug=False, port=8081) #run app in debug mode on port 5000

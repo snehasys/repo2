@@ -9,6 +9,8 @@ void sweepZeroesToEnd(vector<int>& input){
     size_t i=0;
     for(size_t j=0; j<input.size(); ++j){
         if(input.at(j) != 0 ){
+                                                    auto ielem = input.at(i);
+                                                    auto jelem = input.at(j);
             input.at(i) = input.at(j);
             i++; // increment write position
         }
@@ -21,8 +23,10 @@ void sweepZeroesToEnd(vector<int>& input){
 
 int main(){
     vector<int> in = {2,3,0,1,0,2,54,42,12,0,5,0,10};
+    for(auto& val : in) {cout<<val<< " ";}
     sweepZeroesToEnd(in);
     for(auto& val : in) {cout<<val<< " ";}
-
+    int i;
+    cin>>i;
     return 0;
 }
